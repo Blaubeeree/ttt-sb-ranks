@@ -27,34 +27,24 @@ end
 
 function TTTSBRanksDisplay(panel)
     panel:AddColumn(TTTSBSettings["column_name"] or "", function(ply, label)
-        local plyR = TTTSBRanks[ply:SteamID()]
-        local groupR = TTTSBGroups[ply:GetUserGroup()]
+        local rank = TTTSBRanks[ply:SteamID()] or TTTSBGroups[ply:GetUserGroup()]
 
-        if plyR then
-            if plyR.color == "colors" then
-                label:SetTextColor(Color(plyR.r, plyR.g, plyR.b))
+        if rank then
+            if rank.color == "colors" then
+                label:SetTextColor(Color(rank.r, rank.g, rank.b))
             else
                 label:SetTextColor(rainbow())
             end
 
-            return plyR.text
-        elseif groupR then
-            if groupR.color == "colors" then
-                label:SetTextColor(Color(groupR.r, groupR.g, groupR.b))
-            else
-                label:SetTextColor(rainbow())
-            end
-
-            return groupR.text
+            return rank.text
         else
             local defColor = TTTSBSettings["default_color"]
-            local labelColor = Color(255, 255, 255)
 
             if defColor ~= nil then
-                labelColor = Color(defColor.red or 255, defColor.green or 255, defColor.blue or 255)
+                label:SetTextColor(Color(defColor.red or 255, defColor.green or 255, defColor.blue or 255))
+            else
+                label:SetTextColor(Color(255, 255, 255))
             end
-
-            label:SetTextColor(labelColor)
 
             return TTTSBSettings["default_rank"]
         end
