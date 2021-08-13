@@ -51,3 +51,38 @@ function TTTSBRanksDisplay(panel)
     end, TTTSBSettings["column_width"] or 80)
 end
 hook.Add("TTTScoreboardColumns", "TTTSBRanksDisplay", TTTSBRanksDisplay)
+
+hook.Add("OnPlayerChat", "ChatTags", function(ply, text, teamChat, isDead)
+    if ply:IsValid() then
+        local rank = TTTSBRanks[ply:SteamID()] or TTTSBGroups[ply:GetUserGroup()]
+        local color
+
+        local msg = {}
+        if not ply:Alive() then table.Add(msg, {Color(255, 0, 0), "*Dead* "}) end
+        if teamChat then table.Add(msg, {Color(0, 204, 0), "{TEAM} "} ) end
+
+        if rank then
+            if rank.color == "colors" then
+                color = Color(rank.r, rank.g, rank.b)
+            else
+                color = rainbow()
+            end
+
+            table.Add(msg, {color, rank.text})
+        else
+            local defColor = TTTSBSettings["default_color"]
+
+            if defColor ~= nil then
+                color = Color(defColor.red or 255, defColor.green or 255, defColor.blue or 255)
+            else
+                color = Color(255, 255, 255)
+            end
+
+            table.Add(msg, {color, TTTSBSettings["default_rank"]})
+        end
+
+        table.Add(msg, {" ", Color(50, 50, 50), "| ", color, ply:Nick(), Color(255, 255, 255), ": ", text})
+        chat.AddText(unpack(msg))
+        return true
+    end
+end)
