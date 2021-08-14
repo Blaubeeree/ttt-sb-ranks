@@ -36,7 +36,7 @@ function TTTSBRanksDisplay(panel)
                 label:SetTextColor(rainbow())
             end
 
-            return rank.text
+            return string.sub(rank.text, 1, TTTSBSettings["max_length"])
         else
             local defColor = TTTSBSettings["default_color"]
 
@@ -46,7 +46,7 @@ function TTTSBRanksDisplay(panel)
                 label:SetTextColor(Color(255, 255, 255))
             end
 
-            return TTTSBSettings["default_rank"]
+            return string.sub(TTTSBSettings["default_rank"], 1, TTTSBSettings["max_length"])
         end
     end, TTTSBSettings["column_width"] or 80)
 end
@@ -68,7 +68,7 @@ hook.Add("OnPlayerChat", "ChatTags", function(ply, text, teamChat, isDead)
                 color = rainbow()
             end
 
-            table.Add(msg, {color, rank.text})
+            table.Add(msg, {color, string.sub(rank.text, 1, TTTSBSettings["max_length"])})
         else
             local defColor = TTTSBSettings["default_color"]
 
@@ -78,7 +78,7 @@ hook.Add("OnPlayerChat", "ChatTags", function(ply, text, teamChat, isDead)
                 color = Color(255, 255, 255)
             end
 
-            table.Add(msg, {color, TTTSBSettings["default_rank"]})
+            table.Add(msg, {color, string.sub(TTTSBSettings["default_rank"], 1, TTTSBSettings["max_length"])})
         end
 
         table.Add(msg, {" ", Color(50, 50, 50), "| ", color, ply:Nick(), Color(255, 255, 255), ": ", text})

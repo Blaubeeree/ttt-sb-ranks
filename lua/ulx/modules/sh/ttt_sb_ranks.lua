@@ -10,7 +10,8 @@ local TTTSBRanks = {}
 local TTTSBSettings = {
     ["default_rank"] = "Guest",
     ["column_name"] = "Rank",
-    ["column_width"] = 80
+    ["column_width"] = 80,
+    ["max_length"] = -1
 }
 local TTTSBGroups = {}
 
@@ -20,15 +21,15 @@ local function TTTSBRanksRefresh(ply)
     end
 
     if ULib.fileRead(dir .. ranks) then
-        TTTSBRanks = util.JSONToTable(ULib.fileRead(dir .. ranks))
+        table.Merge(TTTSBRanks, util.JSONToTable(ULib.fileRead(dir .. ranks)))
     end
 
     if ULib.fileRead(dir .. settings) then
-        TTTSBSettings = util.JSONToTable(ULib.fileRead(dir .. settings))
+        table.Merge(TTTSBSettings, util.JSONToTable(ULib.fileRead(dir .. settings)))
     end
 
     if ULib.fileRead(dir .. groups) then
-        TTTSBGroups = util.JSONToTable(ULib.fileRead(dir .. groups))
+        table.Merge(TTTSBGroups, util.JSONToTable(ULib.fileRead(dir .. groups)))
     end
 
     if SERVER then
@@ -322,6 +323,7 @@ function ulx.defaultcolor(calling_ply, red, green, blue)
 
     TTTSBRanksRefresh()
 end
+
 local defaultcolor = ulx.command(CATEGORY_NAME, "ulx defaultcolor", ulx.defaultcolor, "!defaultcolor", true)
 defaultcolor:addParam{type = ULib.cmds.NumArg, min = 0, max = 255, default = 255, hint = "Red part of RGB"}
 defaultcolor:addParam{type = ULib.cmds.NumArg, min = 0, max = 255, default = 255, hint = "Green part of RGB"}
@@ -344,6 +346,22 @@ local columnwidth = ulx.command(CATEGORY_NAME, "ulx columnwidth", ulx.columnwidt
 columnwidth:addParam{type = ULib.cmds.NumArg, min = 60, max = 240, default = 80, hint = "Width of the rank column"}
 columnwidth:defaultAccess(ULib.ACCESS_SUPERADMIN)
 columnwidth:help("Changes the column width in the scoreboard - Default: 80")
+
+function ulx.maxLength(calling_ply, length)
+    TTTSBRanksRefresh()
+
+    TTTSBSettings["max_length"] = length
+
+    ULib.fileWrite(dir .. settings, util.TableToJSON(TTTSBSettings))
+    ulx.fancyLogAdmin(calling_ply, true, "#A changed the max rank length to #i", length)
+
+    TTTSBRanksRefresh()
+end
+
+local maxLength = ulx.command(CATEGORY_NAME, "ulx maxlength", ulx.maxLength, "!maxlength", true)
+maxLength:addParam{type = ULib.cmds.NumArg, min = -1, max = 240, default = -1, hint = "Max length a rank can have"}
+maxLength:defaultAccess(ULib.ACCESS_SUPERADMIN)
+maxLength:help("Changes maximum length a rank can have (set to -1 for unlimited length)")
 
 local groupNames = {}
 
